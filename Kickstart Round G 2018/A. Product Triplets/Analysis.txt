@@ -1,0 +1,27 @@
+Product Triplets: Analysis
+Small dataset
+The Small dataset can be solved by complete search. We can check for each possible triplet (x, y, z) (with 1 ≤ x < y < z ≤ N) and check whether at least either one of Ax, Ay, or Az is the product of the other two. Each time we get a valid triplet, we increment our answer variable by one.
+
+Since N ≤ 200 for this dataset, an O(N3) time solution will run within the time limit.
+
+Large dataset
+Let us ignore indices i where Ai = 0 for the time being. In other words, let us assume that Ai > 0 for all i.
+
+We can observe that for any three positive integers a, b, and c, if a × b = c, then a ≤ c and b ≤ c. Therefore, if we sort A in nondecreasing order, for each triplet (x, y, z) (with 1 ≤ x < y < z ≤ N), we only need to check whether Ax × Ay = Az. However, doing this naively will still be an O(N3) time solution.
+
+We can optimize this solution by computing the number of z satisfying y < z and Ax × Ay = Az for each pair (x, y) in constant time. To do this, we can store the number of occurrences of each number in A in a hashmap.
+
+If we design our nested loop such that we have y = {N .. 1} as our outer loop (and x = {y - 1 .. 1} as our inner loop), then we can update our hashmap for Ay just before we decrement the value of y. This is to make sure that our hashmap only contains the elements with indices larger than the current value of y. In other words, the algorithm looks something like:
+
+
+  sort(A)
+  ans = 0
+  occurrences = hashmap()
+  for y : {N .. 1}
+    for x : {y - 1 .. 1}
+      ans = ans + occurrences.count(A[x] * A[y])
+    occurrences.update(A[y], occurrences.get(A[y]) + 1)
+
+We should not forget that our algorithm so far ignores those indices i where Ai = 0. Suppose there are Z such indices (i.e., there are Z zeroes in A). We can make C(Z, 3) triplets using three zeroes, and C(Z, 2) × (N - Z) triplets using two zeroes and one non-zero.
+
+Therefore, we get our final answer by summing the value of ans from our pseudocode, as well as C(Z, 3) and C(Z, 2) × (N - Z). This solution runs in O(N2) time.
